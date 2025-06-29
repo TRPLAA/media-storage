@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Медиа Хранилище</title>
+    <style>
+        body { font-family: Arial; margin: 40px; }
+        .upload-box { padding: 20px; border: 2px dashed #ccc; margin-bottom: 30px; }
+        .file-list { list-style-type: none; padding: 0; }
+        .file-list li { margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Медиа Хранилище</h1>
+    
+    <div class="upload-box">
+        <form id="uploadForm">
+            <input type="file" name="file" required>
+            <button type="submit">Загрузить</button>
+        </form>
+    </div>
+
+    <h2>Файлы:</h2>
+    <ul class="file-list">
+        {% for file in files %}
+            <li>
+                <a href="/download/{{ file }}" download>{{ file }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <script>
+        document.getElementById('uploadForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('file', e.target.file.files[0]);
+            
+            await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+            
+            window.location.reload(); // Обновить список файлов
+        };
+    </script>
+</body>
+</html>
