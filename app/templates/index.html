@@ -3,44 +3,75 @@
 <head>
     <title>Медиа Хранилище</title>
     <style>
-        body { font-family: Arial; margin: 40px; }
-        .upload-box { padding: 20px; border: 2px dashed #ccc; margin-bottom: 30px; }
-        .file-list { list-style-type: none; padding: 0; }
-        .file-list li { margin: 10px 0; }
+        /* ... предыдущие стили ... */
+        .preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .preview-item {
+            width: 200px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .preview-content {
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .preview-content img, .preview-content video {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .file-icon {
+            font-size: 48px;
+        }
     </style>
 </head>
 <body>
-    <h1>Медиа Хранилище</h1>
+    <!-- ... предыдущий HTML ... -->
     
-    <div class="upload-box">
-        <form id="uploadForm">
-            <input type="file" name="file" required>
-            <button type="submit">Загрузить</button>
-        </form>
+    <div class="preview-container">
+        {% for file in files %}
+            <div class="preview-item">
+                <div class="preview-content">
+                    {% if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')) %}
+                    <img src="{{ url_for('thumbnail', filename=file) }}" alt="{{ file }}">
+                    {% elif file.lower().endswith(('.mp4', '.webm', '.mov')) %}
+                        <video controls>
+                            <source src="{{ url_for('preview', filename=file) }}" type="video/mp4">
+                        </video>
+                    {% elif file.lower().endswith(('.pdf')) %}
+                        <div class="file-icon">📄</div>
+                    {% elif file.lower().endswith(('.mp3', '.wav')) %}
+                        <div class="file-icon">🎵</div>
+                    {% else %}
+                        <div class="file-icon">📁</div>
+                    {% endif %}
+                </div>
+                <div>
+                    <a href="{{ url_for('download', filename=file) }}" download>{{ file }}</a>
+                    <button onclick="deleteFile('{{ file }}')">Удалить</button>
+                </div>
+            </div>
+        {% endfor %}
     </div>
 
-    <h2>Файлы:</h2>
-    <ul class="file-list">
-        {% for file in files %}
-            <li>
-                <a href="/download/{{ file }}" download>{{ file }}</a>
-            </li>
-        {% endfor %}
-    </ul>
-
     <script>
-        document.getElementById('uploadForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const formData = new FormData();
-            formData.append('file', e.target.file.files[0]);
-            
-            await fetch('/upload', {
-                method: 'POST',
-                body: formData
-            });
-            
-            window.location.reload(); // Обновить список файлов
-        };
+        // ... предыдущий скрипт ...
+        
+        async function deleteFile(filename) {
+            if (confirm(`Удалить ${filename}?`)) {
+                await fetch(`/delete/${filename}`, { method: 'DELETE' });
+                window.location.reload();
+            }
+        }
     </script>
 </body>
 </html>

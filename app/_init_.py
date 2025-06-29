@@ -1,7 +1,9 @@
-from flask import Flask
+from app import app
+import os
 
-app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['MAX_CONTENT_LENGTH'] = 2000 * 1024 * 1024 * 1024  # 2000GB лимит
-
-from app import routes
+if __name__ == "__main__":
+    # Создать папку для загрузок, если её нет
+    if not os.path.exists(app.config['UPLOAD_FOLDER']):
+        os.makedirs(app.config['UPLOAD_FOLDER'])
+    
+    app.run(host='0.0.0.0', port=5000)
