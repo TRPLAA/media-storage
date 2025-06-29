@@ -6,7 +6,7 @@ pip install -r requirements.txt
 
 echo
 echo "Доступные разделы:"
-df -h --output=target
+df -h --output=target | grep -v 'Mounted'
 echo
 read -p "Введите путь для хранения файлов (например, /mnt/media): " storage_path
 
@@ -17,8 +17,12 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Создание конфигурации..."
+mkdir -p config
 echo "{ \"storage_path\": \"$storage_path\" }" > config/settings.json
 
 echo "Запуск сервера в фоне..."
-nohup python run.py > server.log &
-echo "Готово! Откройте: http://$(hostname -I | cut -d' ' -f1):5000"
+nohup python run.py > server.log 2>&1 &
+
+sleep 2
+echo "Готово! Откройте: http://$(hostname -I | awk '{print $1}'):5000"
+echo "Логи сервера: server.log"

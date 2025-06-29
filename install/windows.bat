@@ -1,4 +1,7 @@
 @echo off
+chcp 65001 > nul
+setlocal enabledelayedexpansion
+
 echo Установка Media Storage...
 python -m venv venv
 call venv\Scripts\activate
@@ -10,18 +13,22 @@ echo Доступные диски:
 wmic logicaldisk get caption
 echo.
 set /p drive="Выберите диск для хранения файлов (например, D): "
-set "drive=%drive%:\MediaStorage"
+set "drive=!drive!:\MediaStorage"
 
-mkdir "%drive%" 2>nul
-if not exist "%drive%" (
+mkdir "!drive!" 2>nul
+if not exist "!drive!" (
     echo Ошибка создания папки! Проверьте правильность ввода.
     goto disk_selection
 )
 
 echo Создание конфигурации...
-echo { "storage_path": "%drive%" } > config/settings.json
+mkdir config 2>nul
+echo { "storage_path": "!drive!" } > config\settings.json
 
 echo Запуск сервера...
-start "" run.py
-echo Готово! Откройте: http://localhost:5000
+start "" python run.py
+echo Готово! Откройте в браузере: http://localhost:5000
+echo Если сервер не запустился автоматически, выполните вручную:
+echo   cd %~dp0
+echo   python run.py
 pause

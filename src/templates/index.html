@@ -64,6 +64,15 @@
     </div>
 
     <script>
+        // Автоматическое воспроизведение видео только при наведении
+        document.querySelectorAll('video').forEach(video => {
+            video.onmouseenter = () => video.play();
+            video.onmouseleave = () => {
+                video.pause();
+                video.currentTime = 0;
+            };
+        });
+
         // ... предыдущий скрипт ...
         
         async function deleteFile(filename) {

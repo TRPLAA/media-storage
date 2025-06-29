@@ -1,6 +1,14 @@
-from flask import render_template, request, send_from_directory, send_file
-from . import app
+from . import app  # Относительный импорт
 import os
+import mimetypes
+from flask import render_template, request, send_from_directory, send_file
+from werkzeug.utils import secure_filename
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'pdf', 'mp3', 'txt'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/')
 def index():
@@ -9,10 +17,21 @@ def index():
 
 @app.route('/upload', methods=['POST'])
 def upload():
+    if 'file' not in request.files:
+        return 'Файл не выбран', 400
+        
     file = request.files['file']
-    if file:
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
-    return '', 204
+    if file.filename == '':
+        return 'Файл не выбран', 400
+        
+    if file and allowed_file(file.filename):
+        # Обезопасим имя файла
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        return '', 204
+    else:
+        return 'Недопустимый тип файла', 400
+        
 
 @app.route('/download/<filename>')
 def download(filename):
