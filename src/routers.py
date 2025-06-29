@@ -1,7 +1,7 @@
-from . import app  # Относительный импорт
+from . import app, bp  # Относительный импорт
 import os
 import mimetypes
-from flask import render_template, request, send_from_directory, send_file
+from flask import render_template, request, send_from_directory, send_file, current_app
 from werkzeug.utils import secure_filename
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'mp4', 'mov', 'pdf', 'mp3', 'txt'}
@@ -44,20 +44,16 @@ def download(filename):
 import magic
 
 # Добавляем новый эндпоинт для превью
-@app.route('/preview/<filename>')
+@bp.route('/preview/<filename>')
 def preview(filename):
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    mime = magic.Magic(mime=True)
-    file_type = mime.from_file(file_path)
+    file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
     
-    # Для текстовых файлов
-    if file_type.startswith('text/'):
-        with open(file_path, 'r') as f:
-            content = f.read()
-        return f'<pre>{content}</pre>'
+    # Безопасная проверка расширения файла
+    if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.mp4', '.mov')):
+        return send_file(file_path)
+    else:
+        return "Предпросмотр недоступен для этого типа файла", 400
     
-    return send_file(file_path)
-
 @app.route('/delete/<filename>', methods=['DELETE'])
 def delete_file(filename):
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)

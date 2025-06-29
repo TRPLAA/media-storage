@@ -26,9 +26,13 @@ mkdir config 2>nul
 echo { "storage_path": "!drive!" } > config\settings.json
 
 echo Запуск сервера...
-start "" python run.py
+start "" venv\Scripts\python run.py
+echo.
+echo ================================================
 echo Готово! Откройте в браузере: http://localhost:5000
-echo Если сервер не запустился автоматически, выполните вручную:
+echo.
+echo Если сервер не запустился автоматически, выполните:
 echo   cd %~dp0
-echo   python run.py
+echo   venv\Scripts\python run.py
+echo ================================================
 pause

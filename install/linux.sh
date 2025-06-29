@@ -21,7 +21,7 @@ mkdir -p config
 echo "{ \"storage_path\": \"$storage_path\" }" > config/settings.json
 
 echo "Запуск сервера в фоне..."
-nohup python run.py > server.log 2>&1 &
+nohup venv/bin/python run.py > server.log 2>&1 &
 
 sleep 2
 echo "Готово! Откройте: http://$(hostname -I | awk '{print $1}'):5000"

@@ -42,10 +42,10 @@
             <div class="preview-item">
                 <div class="preview-content">
                     {% if file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')) %}
-                    <img src="{{ url_for('thumbnail', filename=file) }}" alt="{{ file }}">
-                    {% elif file.lower().endswith(('.mp4', '.webm', '.mov')) %}
+                        <img src="{{ url_for('main.preview', filename=file) }}" alt="{{ file }}">
+                    {% elif file.lower().endswith(('.mp4', '.mov')) %}
                         <video controls>
-                            <source src="{{ url_for('preview', filename=file) }}" type="video/mp4">
+                            <source src="{{ url_for('main.preview', filename=file) }}" type="video/mp4">
                         </video>
                     {% elif file.lower().endswith(('.pdf')) %}
                         <div class="file-icon">📄</div>
@@ -56,7 +56,7 @@
                     {% endif %}
                 </div>
                 <div>
-                    <a href="{{ url_for('download', filename=file) }}" download>{{ file }}</a>
+                    <a href="{{ url_for('main.download', filename=file) }}" download>{{ file }}</a>
                     <button onclick="deleteFile('{{ file }}')">Удалить</button>
                 </div>
             </div>
@@ -64,23 +64,24 @@
     </div>
 
     <script>
-        // Автоматическое воспроизведение видео только при наведении
-        document.querySelectorAll('video').forEach(video => {
-            video.onmouseenter = () => video.play();
-            video.onmouseleave = () => {
-                video.pause();
-                video.currentTime = 0;
-            };
+        // Автоматическое воспроизведение видео при наведении
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('video').forEach(video => {
+                video.onmouseenter = () => video.play();
+                video.onmouseleave = () => {
+                    video.pause();
+                    video.currentTime = 0;
+                };
+            });
         });
-
-        // ... предыдущий скрипт ...
         
+        // Функция удаления файла
         async function deleteFile(filename) {
             if (confirm(`Удалить ${filename}?`)) {
                 await fetch(`/delete/${filename}`, { method: 'DELETE' });
                 window.location.reload();
             }
         }
-    </script>
+        </script>
 </body>
 </html>
